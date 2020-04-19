@@ -1,0 +1,764 @@
+<html>
+	<head>
+		<title>EVE - Market Analysis</title>
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.min.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<style>
+			body { background-color: #333333; }
+			#MudROP {
+				font-size: 13px;
+				padding: 0px 30px 30px 30px;
+				color: #FFFFFF;
+			}
+
+			#MudROP .MROP_Header {
+				position: sticky; z-index: 888888888; top: 0px; padding: 15px 0px; background-color: #333333;
+			}
+			#MudROP .MROP_Header input { background-color: #454545; color: #FFFFFF; border: 1px solid #666666; padding: 2px 5px; }
+
+			#MudROP .MROP_Container table thead th {
+				background-color: #666666;
+				cursor: pointer;
+				padding: 5px;
+				font-weight: bold;
+				border: 1px solid #454545;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				position: sticky;
+				top: 50px;
+				z-index: 888888888;
+			}
+
+			#MudROP .MROP_Container table tbody td {
+				padding: 5px;
+				border: 1px solid #454545;
+			}
+
+			#MudROP th.sorting.ascending {
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAHCAYAAAABIM1CAAAA0UlEQVQoU42QvQ4BURCFz4wtSCQaGiH2ilBstDo1hVAp9F7KGyh0IuEBxBOIwkZyY22pkfi/eyX+slhiupnznZOZIXwpK2FF95FND8yH3fHYcl13G4RS0DCfzMc9Yz/QxKWbTuODOtUdx1m/8x8BQogMKzUCccEPK2BqnI2qvbId//wlIJvKFinkDQEkgzbztLc0iCpzKWcP/Rkg0qLMUH0wx7795XoMsAZ0zZZycu+BnGk2tEIXjPAvs0/baejmQsoB5TKiraE7APhP8wNTILQvGDRByxR8V5EAAAAASUVORK5CYII=);
+				background-position: 95% center;
+				background-size: 6px 6px;
+				background-repeat: no-repeat;
+			}
+
+			#MudROP th.sorting.descending {
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAHCAYAAAABIM1CAAAA1ElEQVQoU5XPsWoCQRAG4H92D0E7SXeHJ9mzsEhvk15BLAPWyVv5BgErISH2NvYWIUIYRUvBSuTI7sgqiqeHmOl25p+PWTLV6iuBegA0/lEO8qdEvZHfqcWPHSF5B1C809gI5OV3NvvcA75MbJ6J3ABA+RbigFVAaE+Zxz53AvwjqSRPouwXAVEu4uzcat1k5u/jPAPsLzEmVqkbikY9i8hEW9v6WSyW5/0rwA/rUfSQBsEHgRqHsIwsUYeZ15eX5QI+FIZhqagLfUcuFaW6zLzN+9YOeUlAyGKsCTwAAAAASUVORK5CYII=);
+				background-position: 95% center;
+				background-size: 6px 6px;
+				background-repeat: no-repeat;
+			}
+			
+			#MudROP button.RefreshBtn {
+				float: right;
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABAklEQVQ4T6XTsSuGURTH8c+7WChlRGQxG1mVUpKJ1UbJqNdiM2GXP0JJWBkxyZ+AxIiQjc7b89R1e56nt96z3dM933PO/f1uS4/R6rFeE2AcU3Tu3OEhaTaI9zhXAaLwCPPZdOfYwBrucVwFGMM13tDGVQGZwz6GMYDlOkB0mcAMPrIJDrBV5CoBo3jEIi6y4l3sJLlKwAJign58Zw8WK6QRaz7nb1ACYsevbuVNVRjBE5ZwVgOYxTpW8VOlwikmMV3qnICGcFt4YqXM5z6IKW7wiW1cJjLuoa+Av9YBIh+Qw0KNssEvTrCJl3S9JiuHacLKEWHlf4VNE3QrQOdez7/xD1VELRHKWd45AAAAAElFTkSuQmCC);
+				background-position: center center;
+				background-size: 12px;
+				background-repeat: no-repeat;
+				display: inline-block;
+				background-color: #EEEEEE;
+				border: 1px solid #CCCCCC;
+				width: 24px;
+				height: 24px;
+				cursor: pointer;
+				vertical-align: middle;
+			}
+			
+			#MudROP button.LocationBtn {
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABA0lEQVQ4T5XTPS9EURDG8d+KQryUahJRIxJKhYJGI76ERuML0Kp9C1FpNGqJd6WISDQa0ell5IycvXbd3VvduXee/5mZZ07HcM8cRvGUss4Q+kXcl/wlPMR7Ag6wj8kKeI2VEof4As8lnsd6QAKwjBvs4b0CvOEKKX7EVvkfsFXMBmAHJ1U1dVdN8RcmSjWtgH7iMyzULfSqYCBxDrEJmMEdsucsu+vk2sYmIONw5F9xvwpqYAyseXJYe5wW93JhG6eVFZ85sPKtq+JegHFsYqQIYvteKmAroG27/wA2cI5pfLSpsYsjTOUQx3BZVnYA/U/KIeL+/F6mgKwltYXyitvM+Qbd4UJP9D/+ywAAAABJRU5ErkJggg==);
+				background-position: center center;
+				background-size: 12px;
+				background-repeat: no-repeat;
+				display: inline-block;
+				background-color: #EEEEEE;
+				border: 1px solid #CCCCCC;
+				width: 24px;
+				height: 24px;
+				cursor: pointer;
+				vertical-align: middle;
+			}
+			
+			.app-loaded {
+				display: block !important;
+			}
+
+			#MudROP .MROP_Container table tbody tr:hover {
+				background-color: #454545;
+			}
+			
+			.loader,
+			.loader:after {
+				border-radius: 50%;
+				width: 10em;
+				height: 10em;
+			}
+
+			.loader {
+				margin: 60px auto;
+				font-size: 10px;
+				position: relative;
+				text-indent: -9999em;
+				border-top: 1.1em solid rgba(148, 169, 189, 0.2);
+				border-right: 1.1em solid rgba(148, 169, 189, 0.2);
+				border-bottom: 1.1em solid rgba(148, 169, 189, 0.2);
+				border-left: 1.1em solid #374c5e;
+				-webkit-transform: translateZ(0);
+				-ms-transform: translateZ(0);
+				transform: translateZ(0);
+				-webkit-animation: load8 1.1s infinite linear;
+				animation: load8 1.1s infinite linear;
+			}
+
+			@-webkit-keyframes load8 {
+				0% {
+					-webkit-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes load8 {
+				0% {
+					-webkit-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			
+			select { background-color: #333333; color: #FFFFFF; }
+			
+			.MROP_Container table tbody td.loss { background-color: #664444; color: #FF6666; }
+			.MROP_Container table tbody td.profit { color: #99CC99 !important; }
+			.MROP_Container table tbody td.betterprofit { background-color: #446644; color: #FFFFFF !important; }
+			
+			.compressed-info {
+				position: absolute; right: calc(100% + 7px); top: 0%; background-color: #FFFFFF; border: 1px solid #999999;
+				color: #666666; display: none; width: 350px; padding: 10px 15px;
+			}
+			.compressed-info::before {
+				content: ""; display: block; border-top: 1px solid #999999; border-right: 1px solid #999999; position: absolute; right: -7px; top: 2px;
+				width: 12px; height: 12px; background-color: #FFFFFF; transform-origin: center center; transform: rotateZ(45deg);
+			}
+			.compressed-container:hover .compressed-info { display: block; }
+			.compressed-container:hover .compressed-info h5 { font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #666666; }
+			
+			.set-location-popup {
+				position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background-color: rgba(0,0,0,0.5); z-index: 999999999; text-align: center;
+			}
+			.set-location-popup .content {
+				padding: 15px; background-color: #333333; position: absolute; top: 50%; left: 50%; transform-origin: center center;
+				transform: translateX(-50%) translateY(-50%); width: 80%;
+			}
+			.set-location-popup .content h4 { margin-bottom: 30px; }
+			.set-location-popup .content select { padding: 5px 15px; width: 31%; display: inline-block; }
+			.set-location-popup .content select:nth-of-type(n+2) { margin-left: 2%; }
+			.set-location-popup .content .Close { position: absolute; right: 15px; top: 15px; }
+			.set-location-popup .content button.SaveLocation {
+				display: inline-block; background-color: #666666; border: 1px solid #999999; cursor: pointer; vertical-align: middle;
+				padding: 5px 15px; margin-top: 0px; margin-top: 15px;
+			}
+		</style>
+	</head>
+	
+	<body id="MudROP" ng-app="app_EVEMarketAnalysis" ng-controller="ctrl_EVEMarketAnalysis">
+		
+		<div class="set-location-popup" ng-show="ShowLocationPopup">
+			<div class="content">
+				<h4 style="text-align: center;">Set Your Current Location</h4>
+				<button ng-click="ShowLocationPopup = false;" class="RefreshBtn Close"></button>
+				
+				<select ng-model="cmb_region" ng-change="LoadConstellations();">
+					<option value="">-- SELECT A REGION --</option>
+					<option ng-repeat="reg in regions track by $index" value="{{$index}}">{{reg.name}}</option>
+				</select>
+				
+				<select ng-show="cmb_region" ng-model="cmb_constellation" ng-change="LoadSystems();">
+					<option value="">-- SELECT A CONSTELLATION --</option>
+					<option ng-repeat="con in constellations track by $index" value="{{$index}}">{{con.name}}</option>
+				</select>
+				
+				<select ng-show="cmb_constellation" ng-model="cmb_system" ng-change="SaveInputs();">
+					<option value="">-- SELECT A SYSTEM --</option>
+					<option ng-repeat="sys in systems track by $index" value="{{$index}}">{{sys.name}}</option>
+				</select>
+				
+				<br/>
+				
+				<button ng-click="SetLocation();" class="SaveLocation">Set Location</button>
+			</div>
+		</div>
+		
+		<div class="loader" ng-style="{'display': appLoaded && priceLoaded ? 'none' : 'block'}"></div>
+		
+		<script type="text/ng-template" id="recursiveOptGroup.html">
+			
+		</script>
+		
+		<div style="display: none;" ng-class="{'app-loaded': appLoaded && priceLoaded }">
+			<div class="MROP_Header">
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAoklEQVQ4T93TPQ4BURSG4WeWQKFXqTU2IKKxEolCVPag0FiKRMEO2MHsQazA5CZzZTBjhunc7v68b875Tm6i5Upa8qJggC2PfZ33jgXSKOjghGEdmd9fMMat2EIXxwaSAE9wDbLXDOokT3CZIJxVSd7gKkGUnNHPe04ximUXc/o0xgOm+eM9ZmUB/7lgjl2bDAK7wgY/hRhDX6KH9bdTaPQtMidPHxHUxcpNAAAAAElFTkSuQmCC" style="vertical-align: text-top; filter: contrast(0) brightness(2);" />&nbsp;<input type="text" ng-model="txt_filter" ng-change="SaveInputs()" placeholder="Filter..." style="width: 150px; margin-right: 15px; display: inline-block;" />
+				
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA+ElEQVQ4T6WS61ECMRRGz3agHdCJlkAHSgVIBUAFagVCB5QgndgBdABz4k0mxiyzM+TfJvd73h248wwj+FfgBXgGvoE9sOvN1gQzYAkIfgjAEXiKu3PcfQI/mUyCWs0HB1QTkI+EzimgUHElwSWGF8BhQiVz4CtcDjWBWNU/GvXaxVu48E5XheARyI9a3zalaX8doCxyqglymbK+R177sH23YW57WVXujF4ctOsUoKLKAnVUmo9MNwly7jQ0UuwfAhV65fUIjGlfOkwRNlWzFuT3mIN/s3V5vS1kB70tpB+tzdduwTItr7eF5HKsoClbuEkw4Y/+HbkCu6RIEXrR/ncAAAAASUVORK5CYII=" style="vertical-align: text-top; filter: contrast(0) brightness(2);" />&nbsp;<input type="number" ng-change="SaveInputs();" ng-model="cargo_capacity" placeholder="Your cargo capacity..." style="width: 150px; margin-right: 15px; display: inline-block;" />
+				
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABt0lEQVQ4T23TyctPURwG8M9rWBhiJwsl87RAbGwohYWxTCHZsiEhQ+bMFl4l/AOmTBGJZIiyITbGItPOhlJkSo++P93irO6933Of80ynzb9rKJZhCvrX+CWu4gieN39pa7x0xk6sQgd8w9ua90Xmv7Afm/A9sxZAhmcwA4+xBZexHDk9z9OwHcNwAXPwowWwD2twDovwFaNwDw/q2xt0wQnMxF6sC0A059SnGFs0T2FWQ95PbMSeAnmIgRgegINFNZTOYmmZdRpTy7TsG4kRddACHEd7Bs/QDz2L+u5Qw8rSfAPrMQHX8Ard8CngAYjb0TeoKI/GXXSt98+4g8O41JD1Gr3/B5A9YbS44or+TuiIibhZIH8BYt4A9CgJiXASZleEt3AIVyreRNkdH1sS2rECc6sL83EStzGuQD5gfAFfx0Icw4FIGIIn5fYYfMHmii0Fy0rrtmJXefOoav4nxqzku7YalogC0gvReb/khEWMDbvpSFobmlVO7mlYLss2XMQSvCvjUvOwSFrnMa9Z5bCI0zuwuhyP+++LYZ/Gt1Q4Rv9oXqbmDR1c13lypZNZ6zofxYvm5t/37XEUkV+zqgAAAABJRU5ErkJggg==" style="vertical-align: text-top; filter: contrast(0) brightness(2);" />&nbsp;<input type="number" ng-change="SaveInputs();" ng-model="wallet_balance" placeholder="How much can you invest?" style="width: 200px; margin-right: 15px; display: inline-block;" />
+				
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABNUlEQVQ4T4XTTStvURTH8Y8BhYHHYiATE5Fu3bGJ7px4BZSHEZnJOzDVVZSUV0C6Y0YMlULdiVJGNw/dFAYULe1Tp+3/d1btwd5r7e9Z+7d+p8HXaMAgBtKKiqu0/uK9fCWKi+jEDBbQiMt0KfIBG8YrtrCLh0iUAf9xgG0c1+gsjkYxhwm054CgN+OtzuXiOLp7QlMOeEEXnisArbhFSw54RD/iKd9FB67RlgPuklD/KgA9SeDuHHCRJnBSAQghNzGSA/ZwhI0KwCLGMJUDlvAT0xWA8MApfueAXpwlHe7rQGJKYbAf+NSqbKTYryXAeG7ZVPsH51gtPpADwiSHuMEswhsRYbAd9OFXsvRnIgcUxWHnIUwmwH5qfb4ErQsoulvGStrE09Zr6VKrg3JdzDyi3s/lA82VNxH0MMLzAAAAAElFTkSuQmCC" style="vertical-align: text-top; filter: contrast(0) brightness(2);" />&nbsp;<input type="number" ng-change="SaveInputs();" ng-model="minimum_security" placeholder="Min. Sec." style="width: 100px; margin-right: 15px; display: inline-block;" />&emsp;
+				
+				<label>
+					<input type="checkbox" ng-model="self_mining_mode" ng-change="SaveInputs();" style="vertical-align: sub;"/>&nbsp;Self-Mining
+				</label>&emsp;
+				
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABUklEQVQ4T6XTP0ubURTH8c9DKQqlJMXBhkL/LJoM3RWkKZkKUkpHh0DeQJbg5FuwQ5I3kCWTDro5BUpK6dDRIQYFodCh6ZBB0KHQp9zwBEzw8VF64S7n/M73nnv+RP7zRBnxDxP/nzRdGmAZ21hPAr/iE37Pg24CPMdnvMrn86IoMh6PQ9wZ3uLndcg84AH2oyj62Gw21ev1ibbVamk0GuI43sMW/k4h84AcflUqlYVerzeTbblc1u/3L/EUF2mAVZzUajWdTmcGUK1WdbvdYHuBH2mAxzgvFApLg8FALhcSMqlBsVg0Go1GeImrNECwf8NaqVSa1CCOY+1223A4DL4veHNbEYNvA4d4hMVEHF4M9x2+ZwGC/wDvcYoYK6E7SQdmapM2SM9wjCeJOgzQ69ChuwzSVPMh+UrIYBNHN41z1i7sIOzB7n134c47mpVBJugfaXxOET/Y0zIAAAAASUVORK5CYII=" style="vertical-align: text-top; filter: contrast(0) brightness(2);" />&nbsp;
+				<span ng-show="location">
+					<strong ng-bind="location.region.name"></strong>&nbsp;&lt;
+					<strong ng-bind="location.constellation.name"></strong>&nbsp;&lt;
+					<strong ng-bind="location.system.name"></strong>
+				</span>
+				<button ng-click="ShowLocationPopup = true;" class="LocationBtn"></button>
+				
+				<button ng-click="RefreshApp();" class="RefreshBtn"></button>
+			</div>
+			<div class="MROP_Container">
+				<table cellpadding="0" cellspacing="0" border="1" style="border: 1px solid #CCCCCC; width: 100%; font-size: 11px;">
+					<thead style="font-size: 10px;">
+						<th ng-class="{'sorting': order_by == 'name', 'ascending' : !order_dir, 'descending' : order_dir }" ng-click="SortBy('name');">Ore/Mineral</th>
+						
+						<th ng-class="{'sorting': order_by == 'ssec', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('ssec');">Sec.</th>
+						<th ng-class="{'sorting': order_by == 'sregion', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('sregion');">Buy Region</th>
+						<th ng-class="{'sorting': order_by == 'sjumps', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('sjumps');">Jumps</th>
+						<th ng-class="{'sorting': order_by == 'sprice', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('sprice');">Buy Price</th>
+						<th ng-class="{'sorting': order_by == 'sqty', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('sqty');">Buy Vol.</th>
+						<th ng-class="{'sorting': order_by == 'cap', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('qty');">You can buy</th>
+						<th ng-class="{'sorting': order_by == 'bsec', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('bsec');">Sec.</th>
+						<th ng-class="{'sorting': order_by == 'bregion', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('bregion');">Sell Region</th>
+						<th ng-class="{'sorting': order_by == 'bjumps', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('bjumps');">Jumps</th>
+						<th ng-class="{'sorting': order_by == 'bprice', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('bprice');">Sell Price</th>
+						<th ng-class="{'sorting': order_by == 'bqty', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('bqty');">Sell Vol.</th>
+						<th ng-class="{'sorting': order_by == 'profit', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('profit');">Total Profit</th>
+						<th ng-class="{'sorting': order_by == 'compProfit', 'ascending' : !order_dir, 'descending' : order_dir }"  ng-click="SortBy('compProfit');">Comp. Profit</th>
+						
+					</thead>
+					<tbody ng-repeat="od in output | orderBy: order_by:order_dir track by $index">
+						<tr>
+							<td><img ng-src="https://imageserver.eveonline.com/Type/{{od.id}}_32.png"/>&emsp;{{od.name}} - ({{od.volume}} m<sup>3</sup>)</td>
+							<td><b ng-style="{'color': getColor(od.ssec)}">{{od.ssec.toFixed(1)}}</b></td>
+							<td ng-attr-title="{{'Station: '+od.sstation}}"><strong ng-bind="od.sregion"></strong></td>
+							<td>{{od.sjumps}}</td>
+							<td><b>{{od.sprice | formatNumbers}}</b> ISK</td>
+							<td>{{od.sqty | formatNumbers}}</td>
+							<td>{{od.qty | formatNumbers}}</td>
+							<td><b ng-style="{'color': getColor(od.bsec)}">{{od.bsec.toFixed(1)}}</b></td>
+							<td ng-attr-title="{{'Station: '+od.bstation}}"><strong ng-bind="od.bregion"></strong></td>
+							<td>{{od.bjumps}}</td>
+							<td><b>{{od.bprice | formatNumbers}}</b> ISK</td>
+							<td>{{od.bqty | formatNumbers}}</td>
+							<td ng-class="{'loss' : od.profit < 0, 'profit' : od.profit > 0 && od.profit < od.compProfit, 'betterprofit' : od.profit > od.compProfit}"><b>{{(od.profit).toFixed(2) | formatNumbers}}</b> ISK</td>
+							<td class="compressed-container" ng-class="{'loss' : od.compProfit < 0, 'profit' : od.compProfit > 0 && od.profit > od.compProfit, 'betterprofit' : od.profit < od.compProfit}" style="position: relative;">
+								<span ng-show="od.compressed"><b>{{(od.compProfit).toFixed(2) | formatNumbers}}</b> ISK</span>
+								<div class="compressed-info" ng-if="od.compressed">
+									<h5 ng-bind="od.compressed.name"></h5>
+									<p>
+										<b>Region</b>: <b ng-style="{'color': getColor(od.bsec)}">{{od.compressed.bsec.toFixed(1)}}</b>&nbsp;<span ng-bind="od.compressed.bregion"></span> &dash; <span ng-bind="od.compressed.bstation"></span>
+									</p>
+									<p>
+										<b>Qty</b>: <span ng-bind="od.compressed.bqty"></span>&emsp;|&emsp;<b>Your Qty:</b>: <span ng-bind="od.compQty"></span>&emsp;|&emsp;<b>Price</b>: <span ng-bind="od.compressed.bprice"></span> ISK
+									</p>
+								</div>
+								<span ng-show="!od.compressed">-</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+	
+	<script>
+		window.scope = false;
+
+		var app = angular.module('app_EVEMarketAnalysis', []);
+
+		app.filter('orderObjectBy', function(){
+			return function(input, attribute) {
+				if (!angular.isObject(input)) return input;
+
+				var array = [];
+				for(var objectKey in input) {
+					array.push(input[objectKey]);
+				}
+
+				array.sort(function(a, b){
+					a = parseInt(a[attribute]);
+					b = parseInt(b[attribute]);
+					return a - b;
+				});
+				return array;
+			}
+		});
+		
+		app.filter('formatNumbers', function(){
+			return function(input, attribute) {
+				if (!typeof input == "number") return input;
+
+				var absVal = Math.abs(input);
+				
+				// millions
+				if(absVal >= 1000000 && absVal <= 999999999){
+					var v = (absVal / 1000000).toFixed(2);
+					return (input<0?"-":"")+(v != parseInt(v) ? v:parseInt(v)) + 'M';
+				}
+				// billions
+				else if(absVal >= 1000000000 && absVal <= 999999999999){
+					var v = (absVal / 1000000000).toFixed(2);
+					return (input<0?"-":"")+(v != parseInt(v) ? v:parseInt(v)) + 'B';
+				} else if( absVal == 0 ) {
+					return "-";
+				} else {
+					var strSplit = (""+absVal).split(".");
+					if( strSplit[0].length > 3 ) {
+						var tArr = [];
+						var tInput = strSplit[0];
+						while(tInput.length > 3) {
+							var tStr = tInput.substr(-3);
+							tArr.splice(0,0,tStr);
+							tInput = tInput.substr(0, tInput.length - 3);
+						}
+						
+						if(tInput.length > 0)
+							tArr.splice(0,0,tInput);
+							
+						return (input<0?"-":"")+tArr.join()+(strSplit[1] ? "."+strSplit[1] : "");
+					} else
+						return input;
+				}
+			}
+		});
+
+		app.controller('ctrl_EVEMarketAnalysis', function($scope, $http, $timeout, $interval, $sce) {
+
+			$scope.appLoaded = false;
+			$scope.priceLoaded = true;
+			$scope.regions = [];
+			$scope.constellations = [];
+			$scope.systems = [];
+			$scope._tempCategories = [];
+			$scope.oreGroupId = false;
+			$scope.oreIds = [];
+			$scope.categories = [];
+			$scope.data = [];
+			$scope.itemData = {};
+			$scope.self_mining_mode = false;
+			$scope.order_by = "name";
+			$scope.order_dir = false;
+
+			$scope.location = false;
+			$scope.ShowLocationPopup = false;
+			
+			if( localStorage.MROP ) {
+				var ls = JSON.parse(localStorage.MROP);
+				if( typeof ls == "object" ) {
+					$.each( ls, function(lk, lv) {
+						$scope[lk] = lv;
+					});
+				}
+			}
+			
+			$scope.getColor = function(value){
+				//value from 0 to 1
+				//value = (1-value)/2;
+				var hue = ((value) * 120).toString(10);
+				return ["hsl(", hue, ",100%,50%)"].join("");
+			};
+			
+			//GET REGIONS...
+			$http({
+				method: 'GET',
+				url: 'https://evemarketer.com/api/v1/regions?language=en',
+				headers: { "Content-Type": undefined }
+			}).then(function successCallback(response) {
+				$scope.regions = response.data;
+				$scope.Init();
+			}, function errorCallback(response) {  });
+			
+			$scope.LoadConstellations = function() {
+				//GET CONSTELLATIONS...
+				if( $scope.cmb_region > -1 ) {
+					$http({
+						method: 'GET',
+						url: 'https://esi.evetech.net/latest/universe/regions/'+$scope.regions[$scope.cmb_region].id+'?datasource=tranquility',
+						headers: { "Content-Type": undefined }
+					}).then(function successCallback(response) {
+						$http({
+							method: 'POST',
+							url: 'https://esi.evetech.net/latest/universe/names/?datasource=tranquility',
+							data: response.data.constellations,
+							headers: { "Content-Type": undefined }
+						}).then(function successCallback(response) {
+							$scope.constellations = response.data;
+						}, function errorCallback(response) {  });
+					}, function errorCallback(response) {  });
+				}
+			};
+			
+			$scope.LoadSystems = function() {
+				//GET SYSTEMS...
+				if( $scope.cmb_constellation > -1 ) {
+					$http({
+						method: 'GET',
+						url: 'https://esi.evetech.net/latest/universe/constellations/'+$scope.constellations[$scope.cmb_constellation].id+'/?datasource=tranquility&language=en-us',
+						headers: { "Content-Type": undefined }
+					}).then(function successCallback(response) {
+						$http({
+							method: 'POST',
+							url: 'https://esi.evetech.net/latest/universe/names/?datasource=tranquility',
+							data: response.data.systems,
+							headers: { "Content-Type": undefined }
+						}).then(function successCallback(response) {
+							$scope.systems = response.data;
+						}, function errorCallback(response) {  });
+					}, function errorCallback(response) {  });
+				}
+			};
+
+			//GET PRODUCT CATEGORIES...
+			$http({
+				method: 'GET',
+				url: 'https://evemarketer.com/api/v1/markets/groups?language=en',
+				headers: { "Content-Type": undefined }
+			}).then(function successCallback(response) {
+				$scope._tempCategories = response.data;
+				$.each( $scope._tempCategories, function(rk,rv) {
+					rv.priceUpdated = false;
+					//FIND STANDARD ORES...
+					
+					//$scope.GetGroupItems(rv);
+					
+					var findStandardOres = function(obj) {
+						if( obj.name == "Standard Ores" ) {
+							$scope.categories = [obj];
+							$scope.oreGroupId = obj.id;
+							$.each(obj.childrens, function(tck, tcv) {
+								$scope.oreIds.push(tcv.id);
+							});
+							return false;
+						} else if(obj.childrens) {
+							$.each(obj.childrens, function(tck, tcv) {
+								findStandardOres(tcv);
+							});
+						}
+					};
+					
+					findStandardOres(rv);
+				});
+				//$scope.categories = [$scope._tempCategories[6].childrens[1].childrens[6].childrens[4]];
+				$scope.Init();
+			}, function errorCallback(response) {  });
+
+			$scope.output = [];
+			
+			$scope.Init = function() {
+				if( $scope.regions && $scope.categories.length > 0 ) {
+					$scope.appLoaded = true;
+					$scope.LoadPrices(0);
+				}
+			};
+
+			$scope.filterItemData = function() {
+				var tArr = [];
+				$.each($scope.data, function(key, item) {
+					var bestCompressed = false;
+					
+					item.compProfit = 0;
+					
+					$.each( $scope.data, function(ck, ci) {
+						if( ci.name == "Compressed "+item.name ) {
+							var compQty = ci.bqty < Math.floor(item.qty/100) ? ci.bqty : Math.floor(item.qty/100);
+							
+							var compProfit = (ci.bprice * compQty) - (item.sprice * compQty * 100);
+							
+							if( $scope.self_mining_mode ) {
+								compQty = ci.bqty < Math.floor(($scope.cargo_capacity/item.volume)/100) ? ci.bqty : Math.floor(($scope.cargo_capacity/item.volume)/100);
+								compProfit = compQty * ci.bprice;
+							}
+							
+							if( bestCompressed ) {
+								if( bestCompressed.compProfit > compProfit ) {
+									bestCompressed = ci;
+									item.normalamt = item.sprice*compQty*100;
+									item.compressedamt = ci.bprice*compQty;
+									item.compProfit = compProfit;
+									item.compQty = compQty;
+								}
+							} else {
+								if( compProfit > 0 ) {
+									bestCompressed = ci;
+									item.normalamt = item.sprice*compQty*100;
+									item.compressedamt = ci.bprice*compQty;
+									item.compProfit = compProfit;
+									item.compQty = compQty;
+								}
+							}
+						}
+					});
+					
+					item.compressed = bestCompressed;
+					
+					var sr = item.sregion.toLowerCase();
+					var br = item.bregion.toLowerCase();
+					var rs = $scope.minimum_security;
+					
+					if (!$scope.txt_filter || (item.name.toLowerCase().indexOf($scope.txt_filter.toLowerCase()) != -1) || (br.toLowerCase().indexOf($scope.txt_filter.toLowerCase()) != -1) || (sr.toLowerCase().indexOf($scope.txt_filter.toLowerCase()) != -1) ) {
+						
+						/*$scope.itemData[k].cap = parseInt(($scope.itemData[k].bvol > 0 ? (parseInt($scope.cargo_capacity) > 0 ? Math.floor(parseInt($scope.cargo_capacity) / $scope.itemData[k].vol).toFixed(0) : 0) : 0));
+						
+						$scope.itemData[k].compcap = parseInt(($scope.itemData[k].compbvol > 0 ? (parseInt($scope.cargo_capacity) > 0 ? Math.floor(parseInt($scope.cargo_capacity) / $scope.itemData[k].cvol).toFixed(0) : 0) : 0));*/
+						
+						if( !$scope.minimum_security || ($scope.minimum_security && rs <= item.bsec && rs <= item.ssec) )
+							tArr.push(item);
+					}
+				});
+
+				$scope.output = tArr;
+			};
+			
+			$scope.$watchGroup(["txt_filter", "cargo_capacity", "wallet_balance"], function(ov, nv) {
+				$scope.filterItemData();
+			});
+			
+			$scope.Route = "secure";
+			
+			$scope.getJumps = function(j) {
+				var j = angular.copy(j);
+				switch($scope.Route) {
+					case "secure":
+						return j>>8&255;
+					case"insecure":
+						return j>>16&255;
+					default:return 255&j;
+				}
+			};
+
+			$scope.SortBy = function(key) {
+				if( $scope.order_by == key ) {
+					$scope.order_dir = !$scope.order_dir;
+				} else {
+					$scope.order_by = key;
+					$scope.order_dir = false;
+				}
+				
+				$scope.SaveInputs();
+			};
+			
+			$scope.TotalPriceRequests = 0;
+			$scope.CompletedPriceRequests = 0;
+			
+			$scope.TotalItemRequests = 0;
+			$scope.CompletedItemRequests = 0;
+
+			$scope.GetGroupItems = function(item) {
+				if( item.hasOwnProperty("has_types") ) {
+					if( item.has_types === 0 ) {
+						$.each( item.childrens, function(ik, iv) {
+							$scope.GetGroupItems(iv);
+						});
+					} else if( item.has_types === 1 && item.childrens === null ) {
+						//LOAD SUB-CATS...
+						console.log(item);
+						$scope.TotalItemRequests++;
+						/*$http({
+							method: 'GET',
+							url: 'https://evemarketer.com/api/v1/markets/groups/'+item.id+'/types?language=en',
+							headers: { "Content-Type": undefined }
+						}).then(function successCallback(response) {
+							$scope.CompletedItemRequests++;
+							$.each(response.data, function(ck, cv) {
+								$timeout( function() {
+									$scope.GetGroupItems(cv);
+								}, 500);
+							});
+						}, function errorCallback(response) {  });*/
+					}
+				}
+			};
+
+			$scope.LoadPrices = function(ind) {
+				console.log("LOAD PRICES..."+ind);
+				if( $scope.appLoaded && (!$scope.categories[ind].hasOwnProperty("priceUpdated") || !$scope.categories[ind].priceUpdated) ) {
+					
+					console.log("Loading Prices for: "+$scope.categories[ind].name);
+					
+					$scope.priceLoaded = false;
+					
+					$scope.TotalPriceRequests = 0;
+					$scope.CompletedPriceRequests = 0;
+					$.each( $scope.categories[ind].childrens, function(ck, cv) {
+						$scope.GetPricesForItem(cv);
+					});
+					
+				}
+			};
+			
+			$scope.GetPricesForItem = function(item) {
+				if( item.hasOwnProperty("has_types") ) {
+					if( item.has_types === 0 ) {
+						$.each( item.childrens, function(ik, iv) {
+							$scope.GetPricesForItem(iv);
+						});
+					} else if( item.has_types === 1 ) {
+						//LOAD SUB-CATS...
+						$scope.TotalPriceRequests++;
+						$http({
+							method: 'GET',
+							url: 'https://evemarketer.com/api/v1/markets/groups/'+item.id+'/types?language=en',
+							headers: { "Content-Type": undefined }
+						}).then(function successCallback(response) {
+							$scope.CompletedPriceRequests++;
+							if( item.market_group_id == $scope.oreGroupId && $scope.oreIds.indexOf(item.market_group_id) < 0 ) {
+								$scope.oreIds.push(item.id);
+							}
+							$.each(response.data, function(ck, cv) {
+								if( $scope.oreIds.indexOf(cv.market_group_id) > -1 && $scope.oreIds.indexOf(cv.id) < 0 ) {
+									$scope.oreIds.push(cv.id);
+								}
+								$scope.GetPricesForItem(cv);
+							});
+						}, function errorCallback(response) {  });
+					}
+				} else {
+					//GET PRICES...
+					
+					var loc = $scope.location ? ($scope.location.system ? $scope.location.system.id : ""): "";
+					
+					$scope.TotalPriceRequests++;
+					$http({
+						method: 'GET',
+						url: 'https://evemarketer.com/api/v1/markets/types/'+item.id+'?origin_system_id='+loc+'&jump_rule=all&language=en',
+						headers: { "Content-Type": undefined }
+					}).then(function successCallback(response) {
+						$scope.CompletedPriceRequests++;
+						var prices = response.data;
+						
+						prices.buy = prices.buy.map( function(item) {
+							item.station.jumps = $scope.getJumps(item.station.jumps);
+							return item;
+						});
+						prices.sell = prices.sell.map( function(item) {
+							item.station.jumps = $scope.getJumps(item.station.jumps);
+							return item;
+						});
+						
+						prices.buy = prices.buy.filter( function(item) {
+							return item.station.jumps <= 20;
+						});
+						prices.sell = prices.sell.filter( function(item) {
+							return item.station.jumps <= 20;
+						});
+						
+						var bestDeals = [], buyDeals = {}, sellDeals = [];
+						var sbestPrice, sbestVolume, sbestJump = false;
+						$.each( prices.buy, function(pbk, pbv) {
+							$.each( prices.sell, function(psk, psv) {
+								var qty = (pbv.volume_remain < psv.volume_remain ? pbv.volume_remain : psv.volume_remain);
+								var cargoQty = $scope.cargo_capacity ? Math.floor(parseInt($scope.cargo_capacity) / prices.type.volume) : qty;
+								qty = cargoQty < qty ? cargoQty : qty;
+								
+								if( $scope.wallet_balance ) {
+									var wallQty = Math.floor($scope.wallet_balance / psv.price);
+									qty = wallQty < qty ? wallQty : qty;
+								}
+								
+								var sAmt = psv.price * qty;
+								var bAmt = pbv.price * qty;
+								var totJumps = pbv.station.jumps + psv.station.jumps;
+								
+								if( $scope.self_mining_mode ) {
+									qty = $scope.cargo_capacity ? Math.floor(parseInt($scope.cargo_capacity) / prices.type.volume) : qty;
+									qty = qty < pbv.volume_remain ? qty : pbv.volume_remain;
+								}
+								
+								var newDeal = { name: prices.type.name, volume: prices.type.volume, sregion: psv.region.name, ssec: psv.station.security, sstation: psv.station.name, sprice: psv.price, sjumps: psv.station.jumps, sqty: psv.volume_remain, qty: qty, bregion: pbv.region.name, bsec: pbv.station.security, bstation: pbv.station.name, bprice: pbv.price, bjumps: pbv.station.jumps, bqty: pbv.volume_remain, profit: (bAmt - sAmt), totJumps: totJumps };
+								
+								if( $scope.self_mining_mode ) {
+									newDeal.profit = pbv.price * qty;
+								}
+								
+								if( !buyDeals.hasOwnProperty(newDeal.bregion+newDeal.sregion) ) {
+									if( newDeal.profit > 0 )
+										buyDeals[newDeal.bregion+newDeal.sregion] = newDeal;
+								} else {
+									if( buyDeals[newDeal.bregion+newDeal.sregion].profit < newDeal.profit ) {
+										buyDeals[newDeal.bregion+newDeal.sregion] = newDeal;
+									}
+								}
+							});
+						});
+						
+						$.each(buyDeals, function(bdk,bdv) {
+							bestDeals.push(bdv);
+						});
+						
+						delete buyDeals;
+						
+						bestDeals.sort(function(a,b){
+							var a_jpp = a.profit/a.totJumps;
+							var b_jpp = b.profit/b.totJumps;
+							return a_jpp < b_jpp ? 1 : (a_jpp > b_jpp ? -1 : 0);
+						});
+												
+						$scope.data = $scope.data.concat(bestDeals.splice(0,5));
+						
+						delete bestDeals;
+						delete prices;
+						
+						if( $scope.TotalPriceRequests == $scope.CompletedPriceRequests ) {
+							//if( $scope._tempCategories.length == $scope.categories.length ) {
+								$scope.priceLoaded = true;
+								console.log("FINISHED...");
+								$scope.filterItemData();
+							/*} else {
+								$timeout( function() {
+									
+									$scope.categories.push( $scope._tempCategories.splice(0,1)[0] );
+									$scope.LoadPrices($scope.categories.length - 1);
+								}, 2000);
+							}*/
+						}
+					}, function errorCallback(response) {  });
+				}
+			};
+
+			$scope.SaveInputs = function() {
+				localStorage.MROP = JSON.stringify({ cargo_capacity: $scope.cargo_capacity, wallet_balance: $scope.wallet_balance, minimum_security: $scope.minimum_security, location: $scope.location, self_mining_mode: $scope.self_mining_mode, txt_filter: $scope.txt_filter, order_by: $scope.order_by, order_dir: $scope.order_dir });
+			};
+			
+			$scope.SetLocation = function() {
+				$scope.location = {
+					region: $scope.regions[$scope.cmb_region],
+					constellation: $scope.constellations[$scope.cmb_constellation],
+					system: $scope.systems[$scope.cmb_system]
+				};
+				$scope.SaveInputs();
+				$scope.ShowLocationPopup = false;
+			};
+			
+			$scope.RefreshApp = function() {
+				window.location.reload();
+			};
+
+			scope = $scope;
+
+		});
+	</script>
+</html>
